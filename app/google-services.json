@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "718869039160",
+    "project_id": "smartsilentscreen",
+    "storage_bucket": "smartsilentscreen.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718869039160:android:e076674de3b0309bd5becd",
+        "android_client_info": {
+          "package_name": "week11.st912530.finalproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBODyXBMvMqvkWe7a7uBA95IkVNJU7x75o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
