@@ -7,28 +7,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import week11.st912530.finalproject.viewmodel.AuthState
 import week11.st912530.finalproject.viewmodel.AuthViewModel
 
 @Composable
-fun SignupScreen(navController: NavHostController, vm: AuthViewModel = viewModel()) {
+fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
 
+    var first by remember { mutableStateOf("") }
+    var last by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var msg by remember { mutableStateOf("") }
+
     when (val state = vm.authState) {
         is AuthState.Success -> {
-            LaunchedEffect(Unit) {
-                navController.navigate("home") {
-                    popUpTo("signup") { inclusive = true }
+            if (state.uid == "signup_ok") {
+                LaunchedEffect(Unit) {
+                    msg = "Sign up successful! Please login."
+                    navController.navigate("login") {
+                        popUpTo("signup") { inclusive = true }
+                    }
                 }
             }
         }
-        is AuthState.Error -> {
-            //
-        }
+        is AuthState.Error -> msg = state.message
         else -> {}
     }
 
@@ -40,18 +44,33 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel = viewModel
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Sign Up", style = MaterialTheme.typography.headlineMedium)
+            Text("Create Account", style = MaterialTheme.typography.headlineMedium)
+
+            if (msg.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                Text(msg, color = MaterialTheme.colorScheme.primary)
+            }
 
             Spacer(Modifier.height(24.dp))
 
+            OutlinedTextField(
+                value = first,
+                onValueChange = { first = it },
+                label = { Text("First Name") }
+            )
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(
+                value = last,
+                onValueChange = { last = it },
+                label = { Text("Last Name") }
+            )
+            Spacer(Modifier.height(12.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") }
             )
-
-            Spacer(Modifier.height(16.dp))
-
+            Spacer(Modifier.height(12.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -62,10 +81,10 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel = viewModel
             Spacer(Modifier.height(24.dp))
 
             Button(
-                onClick = { vm.signup(email, password) },
+                onClick = { vm.signup(first, last, email, password) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Create Account")
+                Text("Register")
             }
         }
     }

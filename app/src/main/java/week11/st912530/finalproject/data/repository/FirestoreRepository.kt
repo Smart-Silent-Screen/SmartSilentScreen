@@ -1,7 +1,11 @@
 package week11.st912530.finalproject.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import week11.st912530.finalproject.data.model.EventLog
 
 class FirestoreRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -27,5 +31,21 @@ class FirestoreRepository(
             .await()
 
         return snapshot.documents.map { it.data ?: emptyMap() }
+    }
+
+    fun observeEvents(userId: String): Flow<List<EventLog>> = callbackFlow {
+        val reg = db.collection("events")
+            .whereEqualTo("userId", userId)
+            .orderBy("timestamp")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val list = snapshot?.toObjects(EventLog::class.java) ?: emptyList()
+                trySend(list).isSuccess
+            }
+
+        awaitClose { reg.remove() }
     }
 }
