@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import week11.st912530.finalproject.ui.components.*
 import week11.st912530.finalproject.viewmodel.AuthViewModel
 
 @Composable
@@ -14,38 +15,29 @@ fun HomeScreen(navController: NavHostController, vm: AuthViewModel) {
 
     val first = vm.userProfile?.get("firstName")?.toString() ?: ""
 
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp)
-        ) {
+    ScreenContainer {
+        ScreenHeader(
+            title = if (first.isNotBlank()) "Welcome, $first!" else "Welcome!"
+        )
 
-            Text(
-                text = if (first.isNotBlank()) "Welcome, $first!" else "Welcome!",
-                style = MaterialTheme.typography.headlineMedium
-            )
+        CommonSpacing.Large()
 
-            Spacer(Modifier.height(20.dp))
+        FeatureCard("Face Down Detection & Control") {
+            navController.navigate("sensor")
+        }
+        FeatureCard("Event Logs") {
+            navController.navigate("logs")
+        }
 
-            FeatureCard("Face Up / Face Down Status")
-            FeatureCard("Silent Mode Automation")
-            FeatureCard("Event Logs") {
-                navController.navigate("logs")
+        CommonSpacing.ExtraLarge()
+
+        Button(onClick = {
+            vm.logout()
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }
             }
-            FeatureCard("Toggle Controls")
-
-            Spacer(Modifier.height(30.dp))
-
-            Button(onClick = {
-                vm.logout()
-                navController.navigate("login") {
-                    popUpTo("home") { inclusive = true }
-                }
-            }) {
-                Text("Logout")
-            }
+        }) {
+            Text("Logout")
         }
     }
 }

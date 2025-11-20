@@ -2,6 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions for sensor monitoring and device control -->
+    <!-- Note: Accelerometer doesn't require explicit permission -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
+    <!-- For future Phase 2: controlling silent mode and screen -->
+    <!-- These will be requested at runtime -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" /> -->
+    <!-- <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" /> -->
+    
+    <!-- For Android 13+ (future foreground service implementation) -->
+    <!-- <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> -->
+    <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> -->
+    <!-- <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" /> -->
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -10,7 +25,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SmartSilentScreen">
+        android:theme="@style/Theme.SmartSilentScreen"
+        tools:targetApi="31">
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -18,10 +35,24 @@
             android:theme="@style/Theme.SmartSilentScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- Future Phase 3: Foreground service for background monitoring -->
+        <!-- Will be added when implementing background operation -->
+        <!--
+        <service
+            android:name=".service.FaceDownMonitorService"
+            android:foregroundServiceType="specialUse"
+            android:enabled="true"
+            android:exported="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="sensor_monitoring" />
+        </service>
+        -->
+        
     </application>
 
 </manifest>

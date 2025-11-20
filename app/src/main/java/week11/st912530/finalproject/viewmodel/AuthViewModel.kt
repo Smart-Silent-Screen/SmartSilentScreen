@@ -7,9 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import week11.st912530.finalproject.data.repository.AuthRepository
+import week11.st912530.finalproject.data.repository.IAuthRepository
 
 class AuthViewModel(
-    private val repository: AuthRepository = AuthRepository()
+    private val repository: IAuthRepository = AuthRepository()
 ) : ViewModel() {
 
     var authState by mutableStateOf<AuthState>(AuthState.Idle)

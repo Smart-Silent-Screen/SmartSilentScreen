@@ -5,9 +5,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import week11.st912530.finalproject.ui.components.*
 import week11.st912530.finalproject.viewmodel.AuthState
 import week11.st912530.finalproject.viewmodel.AuthViewModel
 
@@ -36,56 +35,51 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
         else -> {}
     }
 
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    ScreenContainer(horizontalAlignment = Alignment.CenterHorizontally) {
+        ScreenHeader("Create Account")
+
+        if (msg.isNotEmpty()) {
+            CommonSpacing.Small()
+            InfoMessage(msg)
+        }
+
+        CommonSpacing.Large()
+
+        NameTextField(
+            value = first,
+            onValueChange = { first = it },
+            label = "First Name"
+        )
+        
+        CommonSpacing.Medium()
+        
+        NameTextField(
+            value = last,
+            onValueChange = { last = it },
+            label = "Last Name"
+        )
+        
+        CommonSpacing.Medium()
+        
+        EmailTextField(
+            value = email,
+            onValueChange = { email = it }
+        )
+        
+        CommonSpacing.Medium()
+        
+        PasswordTextField(
+            value = password,
+            onValueChange = { password = it }
+        )
+
+        CommonSpacing.Large()
+
+        Button(
+            onClick = { vm.signup(first, last, email, password) },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Create Account", style = MaterialTheme.typography.headlineMedium)
-
-            if (msg.isNotEmpty()) {
-                Spacer(Modifier.height(8.dp))
-                Text(msg, color = MaterialTheme.colorScheme.primary)
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            OutlinedTextField(
-                value = first,
-                onValueChange = { first = it },
-                label = { Text("First Name") }
-            )
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = last,
-                onValueChange = { last = it },
-                label = { Text("Last Name") }
-            )
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") }
-            )
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation()
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = { vm.signup(first, last, email, password) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Register")
-            }
+            Text("Register")
         }
     }
 }
