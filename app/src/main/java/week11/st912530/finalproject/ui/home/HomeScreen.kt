@@ -1,5 +1,6 @@
 package week11.st912530.finalproject.ui.home
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,11 +12,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import week11.st912530.finalproject.device.DeviceMode
 import week11.st912530.finalproject.sensor.OrientationService
 import week11.st912530.finalproject.sensor.OrientationState
+import week11.st912530.finalproject.service.OrientationMonitorService
 import week11.st912530.finalproject.viewmodel.AuthViewModel
 
 @Composable
@@ -28,6 +32,7 @@ fun HomeScreen(
     val orientationState by orientationService.orientationState.collectAsState()
     val deviceMode by orientationService.deviceController.currentMode.collectAsState()
     val isAutomationEnabled by orientationService.isAutomationEnabled.collectAsState()
+    val context = LocalContext.current
 
     Scaffold { padding ->
         Column(
@@ -56,8 +61,12 @@ fun HomeScreen(
                 onToggle = { enabled ->
                     if (enabled) {
                         orientationService.enableAutomation()
+                        val intent = Intent(context, OrientationMonitorService::class.java)
+                        ContextCompat.startForegroundService(context, intent)
                     } else {
                         orientationService.disableAutomation()
+                        val intent = Intent(context, OrientationMonitorService::class.java)
+                        context.stopService(intent)
                     }
                 }
             )

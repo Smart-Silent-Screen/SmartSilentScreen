@@ -6,5 +6,7 @@ data class EventLog(
     @DocumentId val id: String = "",
     val event: String = "",
     val timestamp: Long = 0L,
-    val userId: String = ""
+    val userId: String = "",
+    val duration: Long? = null,
+    val sessionId: String? = null
 )

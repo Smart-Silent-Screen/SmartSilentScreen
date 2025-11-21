@@ -6,13 +6,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import week11.st912530.finalproject.data.repository.AuthRepository
-import week11.st912530.finalproject.data.repository.FirestoreRepository
 import week11.st912530.finalproject.device.DeviceController
 
 class OrientationService(context: Context) : SensorEventListener {
@@ -87,33 +82,16 @@ class OrientationService(context: Context) : SensorEventListener {
         if (!_isAutomationEnabled.value) return
         
         when (state) {
-            OrientationState.FaceDown -> {
-                logOrientationEvent("FACE_DOWN_START")
-                deviceController.activateFaceDownMode()
-            }
-            OrientationState.FaceUp -> {
-                logOrientationEvent("FACE_UP_START")
-                deviceController.activateFaceUpMode()
-            }
+            OrientationState.FaceDown -> deviceController.activateFaceDownMode()
+            OrientationState.FaceUp -> deviceController.activateFaceUpMode()
             OrientationState.Unknown -> {}
-        }
-    }
-    
-    private fun logOrientationEvent(eventType: String) {
-        val authRepo = AuthRepository()
-        val firestoreRepo = FirestoreRepository()
-        
-        authRepo.currentUser()?.let { uid ->
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    firestoreRepo.logEvent(uid, eventType)
-                } catch (e: Exception) {
-                    Log.e("OrientationService", "Failed to log event: ${e.message}")
-                }
-            }
         }
     }
     
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 }
+
+
+
+
 

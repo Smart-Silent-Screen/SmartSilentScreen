@@ -11,12 +11,20 @@ class FirestoreRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
 
-    suspend fun logEvent(userId: String, eventType: String) {
-        val data = mapOf(
+    suspend fun logEvent(
+        userId: String, 
+        eventType: String, 
+        duration: Long? = null, 
+        sessionId: String? = null
+    ) {
+        val data = mutableMapOf<String, Any>(
             "event" to eventType,
             "timestamp" to System.currentTimeMillis(),
             "userId" to userId
         )
+        
+        duration?.let { data["duration"] = it }
+        sessionId?.let { data["sessionId"] = it }
 
         db.collection("events")
             .add(data)

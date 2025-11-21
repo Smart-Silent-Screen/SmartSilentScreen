@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         orientationService.start()
+        orientationService.deviceController.setActivity(this)
     }
     
     override fun onPause() {
