@@ -5,8 +5,15 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import week11.st912530.finalproject.data.repository.AuthRepository
+import week11.st912530.finalproject.data.repository.FirestoreRepository
+import week11.st912530.finalproject.device.DeviceController
 
 class OrientationService(context: Context) : SensorEventListener {
 
@@ -15,6 +22,11 @@ class OrientationService(context: Context) : SensorEventListener {
     
     private val _orientationState = MutableStateFlow<OrientationState>(OrientationState.Unknown)
     val orientationState: StateFlow<OrientationState> = _orientationState
+    
+    private val _isAutomationEnabled = MutableStateFlow(true)
+    val isAutomationEnabled: StateFlow<Boolean> = _isAutomationEnabled
+    
+    val deviceController = DeviceController(context)
     
     private var filteredZ = 0f
     private val alpha = 0.2f
@@ -33,6 +45,17 @@ class OrientationService(context: Context) : SensorEventListener {
     
     fun stop() {
         sensorManager.unregisterListener(this)
+    }
+    
+    fun enableAutomation() {
+        _isAutomationEnabled.value = true
+        Log.d("OrientationService", "Automation enabled")
+    }
+    
+    fun disableAutomation() {
+        _isAutomationEnabled.value = false
+        deviceController.activateFaceUpMode()
+        Log.d("OrientationService", "Automation disabled")
     }
     
     override fun onSensorChanged(event: SensorEvent?) {
@@ -55,6 +78,38 @@ class OrientationService(context: Context) : SensorEventListener {
         } else if (currentTime - lastChangeTime > debounceDelay) {
             if (detectedState != _orientationState.value) {
                 _orientationState.value = detectedState
+                handleOrientationChange(detectedState)
+            }
+        }
+    }
+    
+    private fun handleOrientationChange(state: OrientationState) {
+        if (!_isAutomationEnabled.value) return
+        
+        when (state) {
+            OrientationState.FaceDown -> {
+                logOrientationEvent("FACE_DOWN_START")
+                deviceController.activateFaceDownMode()
+            }
+            OrientationState.FaceUp -> {
+                logOrientationEvent("FACE_UP_START")
+                deviceController.activateFaceUpMode()
+            }
+            OrientationState.Unknown -> {}
+        }
+    }
+    
+    private fun logOrientationEvent(eventType: String) {
+        val authRepo = AuthRepository()
+        val firestoreRepo = FirestoreRepository()
+        
+        authRepo.currentUser()?.let { uid ->
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    firestoreRepo.logEvent(uid, eventType)
+                } catch (e: Exception) {
+                    Log.e("OrientationService", "Failed to log event: ${e.message}")
+                }
             }
         }
     }

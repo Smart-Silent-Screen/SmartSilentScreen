@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import week11.st912530.finalproject.device.DeviceMode
 import week11.st912530.finalproject.sensor.OrientationService
 import week11.st912530.finalproject.sensor.OrientationState
 import week11.st912530.finalproject.viewmodel.AuthViewModel
@@ -25,6 +26,8 @@ fun HomeScreen(
 ) {
     val first = vm.userProfile?.get("firstName")?.toString() ?: ""
     val orientationState by orientationService.orientationState.collectAsState()
+    val deviceMode by orientationService.deviceController.currentMode.collectAsState()
+    val isAutomationEnabled by orientationService.isAutomationEnabled.collectAsState()
 
     Scaffold { padding ->
         Column(
@@ -42,13 +45,28 @@ fun HomeScreen(
 
             OrientationStatusCard(orientationState)
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(12.dp))
 
-            FeatureCard("Silent Mode Automation")
+            DeviceModeCard(deviceMode)
+
+            Spacer(Modifier.height(20.dp))
+            
+            ToggleControlsCard(
+                isEnabled = isAutomationEnabled,
+                onToggle = { enabled ->
+                    if (enabled) {
+                        orientationService.enableAutomation()
+                    } else {
+                        orientationService.disableAutomation()
+                    }
+                }
+            )
+            
+            Spacer(Modifier.height(12.dp))
+            
             FeatureCard("Event Logs") {
                 navController.navigate("logs")
             }
-            FeatureCard("Toggle Controls")
 
             Spacer(Modifier.height(30.dp))
 
@@ -102,6 +120,81 @@ fun OrientationStatusCard(state: OrientationState) {
                     color = color
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun DeviceModeCard(mode: DeviceMode) {
+    val (status, color) = when (mode) {
+        DeviceMode.NORMAL -> "Normal Mode" to Color(0xFF2196F3)
+        DeviceMode.SILENT -> "Silent Mode Active" to Color(0xFFFF9800)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(color, RoundedCornerShape(6.dp))
+            )
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(
+                    "Device Status",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    status,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = color
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ToggleControlsCard(isEnabled: Boolean, onToggle: (Boolean) -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    "Automation Control",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    if (isEnabled) "Active" else "Disabled",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isEnabled) Color(0xFF4CAF50) else Color(0xFF9E9E9E)
+                )
+            }
+            Switch(
+                checked = isEnabled,
+                onCheckedChange = onToggle
+            )
         }
     }
 }

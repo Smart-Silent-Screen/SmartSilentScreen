@@ -16,6 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         orientationService = OrientationService(this)
+        orientationService.deviceController.setActivity(this)
         
         setContent {
             SmartSilentScreenTheme {
