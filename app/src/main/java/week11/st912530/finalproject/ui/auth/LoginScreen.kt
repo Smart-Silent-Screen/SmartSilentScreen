@@ -8,27 +8,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import week11.st912530.finalproject.viewmodel.AuthState
 import week11.st912530.finalproject.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavHostController, vm: AuthViewModel = viewModel()) {
+fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var msg by remember { mutableStateOf("") }
 
     when (val state = vm.authState) {
         is AuthState.Success -> {
             LaunchedEffect(Unit) {
-                navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
+                if (state.uid != "signup_ok") {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
             }
         }
-        is AuthState.Error -> {
-            // Show snackbar or text
-        }
+        is AuthState.Error -> msg = state.message
         else -> {}
     }
 
@@ -41,6 +41,11 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel = viewModel(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Login", style = MaterialTheme.typography.headlineMedium)
+
+            if (msg.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                Text(msg, color = MaterialTheme.colorScheme.error)
+            }
 
             Spacer(Modifier.height(24.dp))
 
