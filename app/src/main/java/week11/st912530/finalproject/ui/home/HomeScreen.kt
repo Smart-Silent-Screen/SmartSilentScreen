@@ -1,18 +1,30 @@
 package week11.st912530.finalproject.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import week11.st912530.finalproject.sensor.OrientationService
+import week11.st912530.finalproject.sensor.OrientationState
 import week11.st912530.finalproject.viewmodel.AuthViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController, vm: AuthViewModel) {
-
+fun HomeScreen(
+    navController: NavHostController, 
+    vm: AuthViewModel,
+    orientationService: OrientationService
+) {
     val first = vm.userProfile?.get("firstName")?.toString() ?: ""
+    val orientationState by orientationService.orientationState.collectAsState()
 
     Scaffold { padding ->
         Column(
@@ -21,15 +33,17 @@ fun HomeScreen(navController: NavHostController, vm: AuthViewModel) {
                 .padding(padding)
                 .padding(24.dp)
         ) {
-
             Text(
                 text = if (first.isNotBlank()) "Welcome, $first!" else "Welcome!",
                 style = MaterialTheme.typography.headlineMedium
             )
 
+            Spacer(Modifier.height(24.dp))
+
+            OrientationStatusCard(orientationState)
+
             Spacer(Modifier.height(20.dp))
 
-            FeatureCard("Face Up / Face Down Status")
             FeatureCard("Silent Mode Automation")
             FeatureCard("Event Logs") {
                 navController.navigate("logs")
@@ -45,6 +59,48 @@ fun HomeScreen(navController: NavHostController, vm: AuthViewModel) {
                 }
             }) {
                 Text("Logout")
+            }
+        }
+    }
+}
+
+@Composable
+fun OrientationStatusCard(state: OrientationState) {
+    val (status, color) = when (state) {
+        is OrientationState.FaceUp -> "Face Up" to Color(0xFF4CAF50)
+        is OrientationState.FaceDown -> "Face Down" to Color(0xFFFF5722)
+        is OrientationState.Unknown -> "Unknown" to Color(0xFF9E9E9E)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(color, RoundedCornerShape(6.dp))
+            )
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(
+                    "Phone Orientation",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    status,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = color
+                )
             }
         }
     }
