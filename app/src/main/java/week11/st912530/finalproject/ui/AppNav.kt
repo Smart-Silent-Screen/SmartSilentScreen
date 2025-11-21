@@ -1,5 +1,6 @@
 package week11.st912530.finalproject.ui
 
+import android.app.Activity
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -9,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import week11.st912530.finalproject.data.repository.AuthRepository
 import week11.st912530.finalproject.data.repository.FirestoreRepository
+import week11.st912530.finalproject.device.DeviceControlManager
 import week11.st912530.finalproject.sensor.AccelerometerManager
 import week11.st912530.finalproject.ui.auth.LoginScreen
 import week11.st912530.finalproject.ui.auth.SignupScreen
@@ -20,19 +22,19 @@ import week11.st912530.finalproject.viewmodel.LogsViewModel
 import week11.st912530.finalproject.viewmodel.SensorViewModel
 
 @Composable
-fun AppNav(navController: NavHostController) {
-
+fun AppNav(
+    navController: NavHostController,
+    activity: Activity
+) {
     val context = LocalContext.current
     
-    // ViewModels with default implementations
     val authVm: AuthViewModel = viewModel()
     val logsVm: LogsViewModel = viewModel()
     
-    // SensorViewModel with manual dependency injection
-    // We need context to create AccelerometerManager
     val sensorVm: SensorViewModel = viewModel(
         factory = SensorViewModelFactory(
-            context = context
+            context = context,
+            activity = activity
         )
     )
 
@@ -50,10 +52,10 @@ fun AppNav(navController: NavHostController) {
 
 /**
  * Factory for creating SensorViewModel with dependencies.
- * Following Dependency Inversion Principle.
  */
 class SensorViewModelFactory(
-    private val context: Context
+    private val context: Context,
+    private val activity: Activity
 ) : androidx.lifecycle.ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -61,7 +63,8 @@ class SensorViewModelFactory(
             return SensorViewModel(
                 sensorManager = AccelerometerManager(context),
                 firestoreRepository = FirestoreRepository(),
-                authRepository = AuthRepository()
+                authRepository = AuthRepository(),
+                deviceController = DeviceControlManager(context, activity)
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

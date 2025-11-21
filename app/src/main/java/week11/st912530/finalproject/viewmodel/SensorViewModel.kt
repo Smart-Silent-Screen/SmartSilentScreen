@@ -12,18 +12,18 @@ import week11.st912530.finalproject.data.model.OrientationState
 import week11.st912530.finalproject.data.model.SensorSession
 import week11.st912530.finalproject.data.repository.IAuthRepository
 import week11.st912530.finalproject.data.repository.IFirestoreRepository
+import week11.st912530.finalproject.device.IDeviceController
 import week11.st912530.finalproject.sensor.ISensorManager
 import java.util.UUID
 
 /**
  * ViewModel for managing sensor state and face-down detection.
- * Following Single Responsibility Principle - only manages sensor state.
- * Following Dependency Inversion Principle - depends on interfaces, not concrete classes.
  */
 class SensorViewModel(
     private val sensorManager: ISensorManager,
     private val firestoreRepository: IFirestoreRepository,
-    private val authRepository: IAuthRepository
+    private val authRepository: IAuthRepository,
+    private val deviceController: IDeviceController? = null
 ) : ViewModel() {
     
     // Current orientation state
@@ -50,8 +50,33 @@ class SensorViewModel(
     var isSensorAvailable by mutableStateOf(false)
         private set
     
+    // Permissions status
+    var hasRequiredPermissions by mutableStateOf(true)
+        private set
+    
+    var missingPermissions by mutableStateOf<List<String>>(emptyList())
+        private set
+    
     init {
         checkSensorAvailability()
+        checkPermissions()
+    }
+    
+    /**
+     * Check device control permissions
+     */
+    private fun checkPermissions() {
+        deviceController?.let {
+            hasRequiredPermissions = it.hasAllPermissions()
+            missingPermissions = it.getMissingPermissions()
+        }
+    }
+    
+    /**
+     * Refresh permission status
+     */
+    fun refreshPermissions() {
+        checkPermissions()
     }
     
     /**
@@ -149,6 +174,9 @@ class SensorViewModel(
         // Change mode to silent
         currentMode = DeviceMode.Silent
         
+        // Activate device controls (silent mode + dim screen + vibrate)
+        deviceController?.activateFaceDownMode()
+        
         // Log event
         logEvent(EventTypes.FACE_DOWN_START, sessionId = currentSession?.sessionId)
     }
@@ -164,6 +192,9 @@ class SensorViewModel(
         
         // Change mode to normal
         currentMode = DeviceMode.Normal
+        
+        // Restore device controls (normal audio + restore brightness + vibrate)
+        deviceController?.activateFaceUpMode()
         
         // Log event
         logEvent(EventTypes.FACE_UP)

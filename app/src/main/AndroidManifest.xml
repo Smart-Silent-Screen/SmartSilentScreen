@@ -3,14 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permissions for sensor monitoring and device control -->
-    <!-- Note: Accelerometer doesn't require explicit permission -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    
-    <!-- For future Phase 2: controlling silent mode and screen -->
-    <!-- These will be requested at runtime -->
-    <!-- <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" /> -->
-    <!-- <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" /> -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     
     <!-- For Android 13+ (future foreground service implementation) -->
     <!-- <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> -->

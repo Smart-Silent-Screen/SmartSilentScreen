@@ -1,5 +1,6 @@
 package week11.st912530.finalproject.ui.sensor
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,11 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import week11.st912530.finalproject.data.model.OrientationState
 import week11.st912530.finalproject.ui.components.*
+import week11.st912530.finalproject.utils.PermissionHelper
 import week11.st912530.finalproject.viewmodel.SensorViewModel
 
 /**
@@ -20,6 +23,14 @@ import week11.st912530.finalproject.viewmodel.SensorViewModel
  */
 @Composable
 fun SensorScreen(navController: NavHostController, vm: SensorViewModel) {
+    
+    val context = LocalContext.current
+    
+    // Refresh permissions when screen becomes visible
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        vm.refreshPermissions()
+        onDispose { }
+    }
 
     ScreenContainer {
         ScreenHeader("Face Down Detection")
@@ -32,6 +43,19 @@ fun SensorScreen(navController: NavHostController, vm: SensorViewModel) {
             Button(onClick = { vm.clearError() }) {
                 Text("Dismiss")
             }
+            CommonSpacing.Medium()
+        }
+        
+        // Permission status
+        if (!vm.hasRequiredPermissions && vm.missingPermissions.isNotEmpty()) {
+            PermissionCard(
+                missingPermissions = vm.missingPermissions,
+                onRequestPermission = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        PermissionHelper.requestDoNotDisturbPermission(context)
+                    }
+                }
+            )
             CommonSpacing.Medium()
         }
 
