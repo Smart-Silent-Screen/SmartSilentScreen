@@ -44,13 +44,13 @@ class FirestoreRepository(
     fun observeEvents(userId: String): Flow<List<EventLog>> = callbackFlow {
         val reg = db.collection("events")
             .whereEqualTo("userId", userId)
-            .orderBy("timestamp")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
                     return@addSnapshotListener
                 }
-                val list = snapshot?.toObjects(EventLog::class.java) ?: emptyList()
+                val list = snapshot?.toObjects(EventLog::class.java)
+                    ?.sortedByDescending { it.timestamp } ?: emptyList()
                 trySend(list).isSuccess
             }
 
