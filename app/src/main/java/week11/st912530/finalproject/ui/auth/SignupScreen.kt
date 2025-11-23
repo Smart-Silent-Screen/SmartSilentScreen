@@ -42,7 +42,8 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
                 .fillMaxSize()
                 .padding(padding)
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text("Create Account", style = MaterialTheme.typography.headlineMedium)
 
@@ -56,26 +57,30 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
             OutlinedTextField(
                 value = first,
                 onValueChange = { first = it },
-                label = { Text("First Name") }
+                label = { Text("First Name") },
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(
                 value = last,
                 onValueChange = { last = it },
-                label = { Text("Last Name") }
+                label = { Text("Last Name") },
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") }
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(24.dp))

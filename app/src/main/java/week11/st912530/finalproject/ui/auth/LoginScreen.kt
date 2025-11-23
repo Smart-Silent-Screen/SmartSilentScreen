@@ -38,7 +38,8 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
                 .fillMaxSize()
                 .padding(padding)
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text("Login", style = MaterialTheme.typography.headlineMedium)
 
@@ -52,7 +53,8 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") }
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(16.dp))
@@ -61,7 +63,8 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(24.dp))

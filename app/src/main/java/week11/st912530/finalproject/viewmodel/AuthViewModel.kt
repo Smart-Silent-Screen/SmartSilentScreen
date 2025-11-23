@@ -18,6 +18,9 @@ class AuthViewModel(
     var userProfile by mutableStateOf<Map<String, Any>?>(null)
         private set
 
+    val currentUser
+        get() = repository.currentUser
+
     fun signup(first: String, last: String, email: String, password: String) {
         authState = AuthState.Loading
         viewModelScope.launch {
