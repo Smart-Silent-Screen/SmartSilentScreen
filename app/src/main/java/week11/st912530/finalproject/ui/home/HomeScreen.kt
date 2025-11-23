@@ -4,7 +4,9 @@ import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,6 +35,7 @@ fun HomeScreen(
     val deviceMode by orientationService.deviceController.currentMode.collectAsState()
     val isAutomationEnabled by orientationService.isAutomationEnabled.collectAsState()
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     Scaffold { padding ->
         Column(
@@ -40,6 +43,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(24.dp)
+                .verticalScroll(scrollState)
         ) {
             Text(
                 text = if (first.isNotBlank()) "Welcome, $first!" else "Welcome!",
