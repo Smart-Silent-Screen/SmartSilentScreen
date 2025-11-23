@@ -19,9 +19,11 @@ fun AppNav(navController: NavHostController, orientationService: OrientationServ
     val authVm: AuthViewModel = viewModel()
     val logsVm: LogsViewModel = viewModel()
 
+    val startDestination = if (authVm.currentUser != null) "home" else "login"
+
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = startDestination
     ) {
         composable("login") { LoginScreen(navController, authVm) }
         composable("signup") { SignupScreen(navController, authVm) }

@@ -1,6 +1,7 @@
 package week11.st912530.finalproject.ui.home
 
 import android.content.Intent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -106,7 +107,8 @@ fun OrientationStatusCard(state: OrientationState) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .animateContentSize(),
         colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))
     ) {
         Row(
@@ -147,7 +149,8 @@ fun DeviceModeCard(mode: DeviceMode) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .animateContentSize(),
         colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))
     ) {
         Row(
@@ -184,6 +187,7 @@ fun ToggleControlsCard(isEnabled: Boolean, onToggle: (Boolean) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .animateContentSize()
     ) {
         Row(
             modifier = Modifier
@@ -218,6 +222,7 @@ fun FeatureCard(title: String, onClick: (() -> Unit)? = null) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .animateContentSize()
             .let {
                 if (onClick != null) {
                     it.clickable { onClick() }
