@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.flow.collect
 import week11.st912530.finalproject.data.repository.AuthRepository
 
 class AuthViewModel(
@@ -18,8 +20,16 @@ class AuthViewModel(
     var userProfile by mutableStateOf<Map<String, Any>?>(null)
         private set
 
-    val currentUser
-        get() = repository.currentUser
+    var currentUser by mutableStateOf<FirebaseUser?>(null)
+        private set
+
+    init {
+        viewModelScope.launch {
+            repository.getAuthState().collect { user ->
+                currentUser = user
+            }
+        }
+    }
 
     fun signup(first: String, last: String, email: String, password: String) {
         authState = AuthState.Loading

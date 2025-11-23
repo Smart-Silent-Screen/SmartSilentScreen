@@ -3,9 +3,13 @@ package week11.st912530.finalproject.ui.auth
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import android.util.Patterns
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import week11.st912530.finalproject.viewmodel.AuthState
@@ -16,9 +20,16 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var msg by remember { mutableStateOf("") }
 
-    when (val state = vm.authState) {
+    val state = vm.authState
+    val isLoading = state is AuthState.Loading
+
+    val isEmailValid = email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val isPasswordValid = password.length >= 6
+
+    when (state) {
         is AuthState.Success -> {
             LaunchedEffect(Unit) {
                 if (state.uid != "signup_ok") {
@@ -54,8 +65,18 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = email.isNotBlank() && !isEmailValid
             )
+
+            if (email.isNotBlank() && !isEmailValid) {
+                Text(
+                    text = "Please enter a valid email",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
             Spacer(Modifier.height(16.dp))
 
@@ -63,17 +84,43 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        val vis = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        Icon(imageVector = vis, contentDescription = if (passwordVisible) "Hide password" else "Show password")
+                    }
+                },
+                isError = password.isNotBlank() && !isPasswordValid
             )
+
+            if (password.isNotBlank() && !isPasswordValid) {
+                Text(
+                    text = "Password must be at least 6 characters",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
             Spacer(Modifier.height(24.dp))
 
             Button(
                 onClick = { vm.login(email, password) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading && isEmailValid && isPasswordValid
             ) {
-                Text("Login")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Login")
+                }
             }
 
             Spacer(Modifier.height(12.dp))
