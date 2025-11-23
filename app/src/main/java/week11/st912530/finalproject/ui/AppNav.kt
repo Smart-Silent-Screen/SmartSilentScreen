@@ -1,10 +1,13 @@
 package week11.st912530.finalproject.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import week11.st912530.finalproject.sensor.OrientationService
 import week11.st912530.finalproject.ui.auth.LoginScreen
 import week11.st912530.finalproject.ui.auth.SignupScreen
@@ -18,12 +21,25 @@ fun AppNav(navController: NavHostController, orientationService: OrientationServ
 
     val authVm: AuthViewModel = viewModel()
     val logsVm: LogsViewModel = viewModel()
+    val currentUser = authVm.currentUser
+    val backStackEntry by navController.currentBackStackEntryAsState()
 
-    val startDestination = if (authVm.currentUser != null) "home" else "login"
+    // Use a fixed start destination and reactively navigate when auth changes
+    LaunchedEffect(currentUser) {
+        if (currentUser != null) {
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
+        } else {
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = "login"
     ) {
         composable("login") { LoginScreen(navController, authVm) }
         composable("signup") { SignupScreen(navController, authVm) }

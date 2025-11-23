@@ -21,7 +21,10 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
 
     var msg by remember { mutableStateOf("") }
 
-    when (val state = vm.authState) {
+    val state = vm.authState
+    val isLoading = state is AuthState.Loading
+
+    when (state) {
         is AuthState.Success -> {
             if (state.uid == "signup_ok") {
                 LaunchedEffect(Unit) {
@@ -87,9 +90,18 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
 
             Button(
                 onClick = { vm.signup(first, last, email, password) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
-                Text("Register")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Register")
+                }
             }
         }
     }

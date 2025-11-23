@@ -18,7 +18,10 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
     var password by remember { mutableStateOf("") }
     var msg by remember { mutableStateOf("") }
 
-    when (val state = vm.authState) {
+    val state = vm.authState
+    val isLoading = state is AuthState.Loading
+
+    when (state) {
         is AuthState.Success -> {
             LaunchedEffect(Unit) {
                 if (state.uid != "signup_ok") {
@@ -71,9 +74,19 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
 
             Button(
                 onClick = { vm.login(email, password) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
-                Text("Login")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Login")
+                }
             }
 
             Spacer(Modifier.height(12.dp))
