@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -45,6 +46,13 @@ fun HomeScreen(
     val isAutomationEnabled by orientationService.isAutomationEnabled.collectAsState()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+
+    // Safety net: if UI shows Face Up but mode is still SILENT, resync it to Normal
+    LaunchedEffect(orientationState, deviceMode) {
+        if (orientationState is OrientationState.FaceUp && deviceMode == DeviceMode.SILENT) {
+            orientationService.deviceController.activateFaceUpMode()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -81,7 +89,7 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(12.dp))
 
-                DeviceModeCard(deviceMode)
+                DeviceModeCard(deviceMode, orientationState)
 
                 Spacer(Modifier.height(20.dp))
 
@@ -194,8 +202,16 @@ fun OrientationStatusCard(state: OrientationState) {
 }
 
 @Composable
-fun DeviceModeCard(mode: DeviceMode) {
-    val (status, color, icon) = when (mode) {
+fun DeviceModeCard(mode: DeviceMode, orientationState: OrientationState) {
+
+    // If orientation and mode disagree, trust orientation for the UI
+    val effectiveMode = when (orientationState) {
+        is OrientationState.FaceDown -> DeviceMode.SILENT
+        is OrientationState.FaceUp -> DeviceMode.NORMAL
+        is OrientationState.Unknown -> mode
+    }
+
+    val (status, color, icon) = when (effectiveMode) {
         DeviceMode.NORMAL -> Triple(
             "Normal Mode",
             Color(0xFF2196F3),
