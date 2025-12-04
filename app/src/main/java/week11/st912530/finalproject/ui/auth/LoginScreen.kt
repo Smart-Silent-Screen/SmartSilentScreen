@@ -6,8 +6,12 @@ import androidx.compose.runtime.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import android.util.Patterns
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -43,90 +47,126 @@ fun LoginScreen(navController: NavHostController, vm: AuthViewModel) {
         else -> {}
     }
 
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Login", style = MaterialTheme.typography.headlineMedium)
-
-            if (msg.isNotEmpty()) {
-                Spacer(Modifier.height(8.dp))
-                Text(msg, color = MaterialTheme.colorScheme.error)
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                isError = email.isNotBlank() && !isEmailValid
-            )
-
-            if (email.isNotBlank() && !isEmailValid) {
-                Text(
-                    text = "Please enter a valid email",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        val vis = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        Icon(imageVector = vis, contentDescription = if (passwordVisible) "Hide password" else "Show password")
-                    }
-                },
-                isError = password.isNotBlank() && !isPasswordValid
-            )
-
-            if (password.isNotBlank() && !isPasswordValid) {
-                Text(
-                    text = "Password must be at least 6 characters",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = { vm.login(email, password) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading && isEmailValid && isPasswordValid
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+    // Background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFF6F7FF),
+                        Color(0xFFEDEFFF)
                     )
-                } else {
-                    Text("Login")
+                )
+            )
+    ) {
+        Scaffold(
+            containerColor = Color.Transparent
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                // App Name
+                Text(
+                    "Smart Silent Screen",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = Color(0xFF3A3A3A)
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "Automatic silence, smarter focus.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                if (msg.isNotEmpty()) {
+                    Text(msg, color = MaterialTheme.colorScheme.error)
+                    Spacer(Modifier.height(12.dp))
                 }
-            }
 
-            Spacer(Modifier.height(12.dp))
+                //Email field with icon
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Email, contentDescription = "Email")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = email.isNotBlank() && !isEmailValid
+                )
 
-            TextButton(onClick = { navController.navigate("signup") }) {
-                Text("No account? Sign up")
+                if (email.isNotBlank() && !isEmailValid) {
+                    Text(
+                        "Please enter a valid email",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                //Password field with icon
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password") },
+                    visualTransformation =
+                        if (passwordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            val icon =
+                                if (passwordVisible) Icons.Filled.Visibility
+                                else Icons.Filled.VisibilityOff
+                            Icon(icon, contentDescription = null)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = password.isNotBlank() && !isPasswordValid
+                )
+
+                if (password.isNotBlank() && !isPasswordValid) {
+                    Text(
+                        "Password must be at least 6 characters",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Button(
+                    onClick = { vm.login(email, password) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading && isEmailValid && isPasswordValid,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else Text("Login")
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                TextButton(onClick = { navController.navigate("signup") }) {
+                    Text("No account? Sign up")
+                }
             }
         }
     }
