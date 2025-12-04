@@ -1,5 +1,6 @@
 package week11.st912530.finalproject.ui
 
+import HomeScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,7 +13,6 @@ import week11.st912530.finalproject.sensor.OrientationService
 import week11.st912530.finalproject.ui.auth.LoginScreen
 import week11.st912530.finalproject.ui.auth.SignupScreen
 import week11.st912530.finalproject.ui.home.EventLogsScreen
-import week11.st912530.finalproject.ui.home.HomeScreen
 import week11.st912530.finalproject.viewmodel.AuthViewModel
 import week11.st912530.finalproject.viewmodel.LogsViewModel
 
