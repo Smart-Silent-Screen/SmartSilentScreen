@@ -9,8 +9,15 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material3.IconButton
 import android.util.Patterns
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -25,7 +32,6 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-
     var msg by remember { mutableStateOf("") }
 
     val state = vm.authState
@@ -51,110 +57,125 @@ fun SignupScreen(navController: NavHostController, vm: AuthViewModel) {
         else -> {}
     }
 
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Create Account", style = MaterialTheme.typography.headlineMedium)
-
-            if (msg.isNotEmpty()) {
-                Spacer(Modifier.height(8.dp))
-                Text(msg, color = MaterialTheme.colorScheme.primary)
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            OutlinedTextField(
-                value = first,
-                onValueChange = { first = it },
-                label = { Text("First Name") },
-                modifier = Modifier.fillMaxWidth(),
-                isError = first.isNotBlank() && !isFirstValid
-            )
-            if (first.isNotBlank() && !isFirstValid) {
-                Text(
-                    text = "Please enter first name",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = last,
-                onValueChange = { last = it },
-                label = { Text("Last Name") },
-                modifier = Modifier.fillMaxWidth(),
-                isError = last.isNotBlank() && !isLastValid
-            )
-            if (last.isNotBlank() && !isLastValid) {
-                Text(
-                    text = "Please enter last name",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                isError = email.isNotBlank() && !isEmailValid
-            )
-            if (email.isNotBlank() && !isEmailValid) {
-                Text(
-                    text = "Please enter a valid email",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        val vis = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        Icon(imageVector = vis, contentDescription = if (passwordVisible) "Hide password" else "Show password")
-                    }
-                },
-                isError = password.isNotBlank() && !isPasswordValid
-            )
-            if (password.isNotBlank() && !isPasswordValid) {
-                Text(
-                    text = "Password must be at least 6 characters",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = { vm.signup(first, last, email, password) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading && isFirstValid && isLastValid && isEmailValid && isPasswordValid
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+    // Background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFF6F7FF),
+                        Color(0xFFEDEFFF)
                     )
-                } else {
-                    Text("Register")
+                )
+            )
+    ) {
+        Scaffold(containerColor = Color.Transparent) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                // App name
+                Text(
+                    "Smart Silent Screen",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = Color(0xFF3A3A3A)
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "Create your account",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                if (msg.isNotEmpty()) {
+                    Text(msg, color = Color(0xFF0066CC))
+                    Spacer(Modifier.height(12.dp))
+                }
+
+                // First Name
+                OutlinedTextField(
+                    value = first,
+                    onValueChange = { first = it },
+                    label = { Text("First Name") },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = "First Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = first.isNotBlank() && !isFirstValid
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                // Last Name
+                OutlinedTextField(
+                    value = last,
+                    onValueChange = { last = it },
+                    label = { Text("Last Name") },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Last Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = last.isNotBlank() && !isLastValid
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                // Email
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = email.isNotBlank() && !isEmailValid
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                // Password
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password") },
+                    visualTransformation =
+                        if (passwordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            val icon =
+                                if (passwordVisible) Icons.Filled.Visibility
+                                else Icons.Filled.VisibilityOff
+                            Icon(icon, contentDescription = null)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = password.isNotBlank() && !isPasswordValid
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                Button(
+                    onClick = { vm.signup(first, last, email, password) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading &&
+                            isFirstValid &&
+                            isLastValid &&
+                            isEmailValid &&
+                            isPasswordValid,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else Text("Register")
                 }
             }
         }
