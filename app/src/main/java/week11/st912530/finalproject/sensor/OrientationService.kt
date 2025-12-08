@@ -5,7 +5,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import week11.st912530.finalproject.device.DeviceController
@@ -44,13 +43,10 @@ class OrientationService(context: Context) : SensorEventListener {
     
     fun enableAutomation() {
         _isAutomationEnabled.value = true
-        Log.d("OrientationService", "Automation enabled")
     }
     
     fun disableAutomation() {
         _isAutomationEnabled.value = false
-        deviceController.activateFaceUpMode()
-        Log.d("OrientationService", "Automation disabled")
     }
     
     override fun onSensorChanged(event: SensorEvent?) {
@@ -72,15 +68,17 @@ class OrientationService(context: Context) : SensorEventListener {
             lastChangeTime = currentTime
         } else if (currentTime - lastChangeTime > debounceDelay) {
             if (detectedState != _orientationState.value) {
+                // Always update the UI orientation display
                 _orientationState.value = detectedState
-                handleOrientationChange(detectedState)
+                // Only respond to orientation changes if automation is enabled
+                if (_isAutomationEnabled.value) {
+                    handleOrientationChange(detectedState)
+                }
             }
         }
     }
     
     private fun handleOrientationChange(state: OrientationState) {
-        if (!_isAutomationEnabled.value) return
-        
         when (state) {
             OrientationState.FaceDown -> deviceController.activateFaceDownMode()
             OrientationState.FaceUp -> deviceController.activateFaceUpMode()

@@ -2,7 +2,6 @@ package week11.st912530.finalproject.device
 
 import android.content.Context
 import android.media.AudioManager
-import android.util.Log
 
 class AudioController(private val context: Context) {
     
@@ -11,24 +10,21 @@ class AudioController(private val context: Context) {
     
     fun saveCurrentMode() {
         savedRingerMode = audioManager.ringerMode
-        Log.d("AudioController", "Saved ringer mode: $savedRingerMode")
     }
     
     fun enableSilentMode() {
         try {
             audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
-            Log.d("AudioController", "Silent mode enabled")
         } catch (e: Exception) {
-            Log.e("AudioController", "Failed to enable silent mode: ${e.message}")
+            // Silently ignore
         }
     }
     
     fun restoreSavedMode() {
         try {
             audioManager.ringerMode = savedRingerMode
-            Log.d("AudioController", "Restored ringer mode: $savedRingerMode")
         } catch (e: Exception) {
-            Log.e("AudioController", "Failed to restore mode: ${e.message}")
+            // Silently ignore
         }
     }
 }

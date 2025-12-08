@@ -3,7 +3,6 @@ package week11.st912530.finalproject.device
 import android.app.Activity
 import android.content.Context
 import android.os.PowerManager
-import android.util.Log
 
 interface IScreenLockController {
     fun releaseWakeLock()
@@ -28,9 +27,8 @@ class ScreenLockController(private val context: Context) : IScreenLockController
             activity.window?.attributes = activity.window?.attributes?.apply {
                 screenBrightness = 0.01f
             }
-            Log.d(TAG, "Screen dimmed")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to dim screen: ${e.message}")
+            // Silently ignore
         }
     }
     
@@ -39,15 +37,13 @@ class ScreenLockController(private val context: Context) : IScreenLockController
             activity.window?.attributes = activity.window?.attributes?.apply {
                 screenBrightness = -1f
             }
-            Log.d(TAG, "Screen brightness restored")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to restore brightness: ${e.message}")
+            // Silently ignore
         }
     }
     
     override fun acquireWakeLock() {
         if (wakeLock?.isHeld == true) {
-            Log.d(TAG, "Wake lock already held")
             return
         }
         
@@ -58,9 +54,8 @@ class ScreenLockController(private val context: Context) : IScreenLockController
             ).apply {
                 acquire(10 * 60 * 1000L)
             }
-            Log.d(TAG, "Wake lock acquired")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to acquire wake lock: ${e.message}")
+            // Silently ignore
         }
     }
     
@@ -69,12 +64,11 @@ class ScreenLockController(private val context: Context) : IScreenLockController
             wakeLock?.let {
                 if (it.isHeld) {
                     it.release()
-                    Log.d(TAG, "Wake lock released")
                 }
             }
             wakeLock = null
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to release wake lock: ${e.message}")
+            // Silently ignore
         }
     }
     

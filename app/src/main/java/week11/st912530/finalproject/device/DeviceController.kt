@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,7 +61,6 @@ class DeviceController(context: Context) {
 
         _currentMode.value = DeviceMode.SILENT
         logEvent("FACE_DOWN_START", sessionId = sessionId)
-        Log.d("DeviceController", "Face down mode activated - Session: $sessionId")
     }
 
     fun activateFaceUpMode() {
@@ -85,22 +83,18 @@ class DeviceController(context: Context) {
 
         sessionId = ""
         sessionStartTime = 0L
-
-        Log.d("DeviceController", "Face up mode activated - Duration: ${duration}ms")
     }
 
     private fun vibratePattern(pattern: LongArray) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
-                Log.d("DeviceController", "Vibration triggered: ${pattern.contentToString()}")
             } else {
                 @Suppress("DEPRECATION")
                 vibrator.vibrate(pattern, -1)
-                Log.d("DeviceController", "Vibration triggered (legacy): ${pattern.contentToString()}")
             }
         } catch (e: Exception) {
-            Log.e("DeviceController", "Failed to vibrate: ${e.message}")
+            // Silently ignore
         }
     }
 
@@ -110,7 +104,7 @@ class DeviceController(context: Context) {
                 try {
                     firestoreRepo.logEvent(uid, eventType, duration, sessionId)
                 } catch (e: Exception) {
-                    Log.e("DeviceController", "Failed to log event: ${e.message}")
+                    // Silently ignore
                 }
             }
         }

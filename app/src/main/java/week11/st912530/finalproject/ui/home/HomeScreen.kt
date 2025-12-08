@@ -47,9 +47,9 @@ fun HomeScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    // Safety net: if UI shows Face Up but mode is still SILENT, resync it to Normal
-    LaunchedEffect(orientationState, deviceMode) {
-        if (orientationState is OrientationState.FaceUp && deviceMode == DeviceMode.SILENT) {
+    // Safety net: if UI shows Face Up but mode is still SILENT, resync it to Normal (only if automation is enabled)
+    LaunchedEffect(orientationState, deviceMode, isAutomationEnabled) {
+        if (isAutomationEnabled && orientationState is OrientationState.FaceUp && deviceMode == DeviceMode.SILENT) {
             orientationService.deviceController.activateFaceUpMode()
         }
     }
@@ -89,7 +89,7 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(12.dp))
 
-                DeviceModeCard(deviceMode, orientationState)
+                DeviceModeCard(deviceMode, orientationState, isAutomationEnabled)
 
                 Spacer(Modifier.height(20.dp))
 
@@ -202,13 +202,18 @@ fun OrientationStatusCard(state: OrientationState) {
 }
 
 @Composable
-fun DeviceModeCard(mode: DeviceMode, orientationState: OrientationState) {
+fun DeviceModeCard(mode: DeviceMode, orientationState: OrientationState, isAutomationEnabled: Boolean) {
 
-    // If orientation and mode disagree, trust orientation for the UI
-    val effectiveMode = when (orientationState) {
-        is OrientationState.FaceDown -> DeviceMode.SILENT
-        is OrientationState.FaceUp -> DeviceMode.NORMAL
-        is OrientationState.Unknown -> mode
+    // If automation is enabled, sync device mode with orientation
+    // If automation is disabled, show the actual device mode (not orientation-based)
+    val effectiveMode = if (isAutomationEnabled) {
+        when (orientationState) {
+            is OrientationState.FaceDown -> DeviceMode.SILENT
+            is OrientationState.FaceUp -> DeviceMode.NORMAL
+            is OrientationState.Unknown -> mode
+        }
+    } else {
+        mode  // Show actual device mode when automation is disabled
     }
 
     val (status, color, icon) = when (effectiveMode) {
